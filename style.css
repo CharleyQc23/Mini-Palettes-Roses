@@ -1,0 +1,137 @@
+:root {
+    --rose-clair: #fce4ec;
+    --rose: #f8bbd0;
+    --rose-foncé: #ec407a;
+    --blanc: #ffffff;
+    --gris: #f5f5f5;
+  }
+  
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--rose-clair);
+    color: var(--rose-foncé);
+  }
+  
+  /* 🧁 Bannière */
+  .banniere {
+    background-color: var(--rose-foncé);
+    padding: 2rem;
+    text-align: center;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .banniere h1 {
+    font-family: 'Pacifico', cursive;
+    color: var(--blanc);
+    font-size: 3rem;
+    margin: 0;
+  }
+  
+  .banniere p {
+    color: var(--rose-clair);
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+  }
+  
+  /* 🖼️ Galerie */
+  .galerie {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+  }
+  
+  .produit {
+    background-color: var(--blanc);
+    border-radius: 20px;
+    padding: 1rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+  }
+  
+  .produit:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  }
+  
+  .produit img {
+    max-width: 100%;
+    border-radius: 15px;
+    transition: transform 0.3s ease;
+  }
+  
+  .produit:hover img {
+    transform: scale(1.05);
+  }
+  
+  .produit h3 {
+    margin: 0.8rem 0 0.3rem;
+    font-size: 1.2rem;
+    color: var(--rose-foncé);
+  }
+  
+  .produit p {
+    font-size: 1rem;
+    color: #666;
+    margin: 0.3rem 0 1rem;
+  }
+  
+  /* 🛍️ Bouton Ajouter au panier */
+  .btn-ajouter {
+    background-color: var(--rose-foncé);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .btn-ajouter:hover {
+    background-color: #c2185b;
+    transform: scale(1.05);
+  }
+  
+  /* 🛒 Panier */
+  #panier {
+    padding: 2rem;
+    background-color: var(--gris);
+  }
+  
+  #panier h2 {
+    margin-top: 0;
+  }
+  
+  #panier ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  #panier li {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* 💳 Bouton Paiement */
+  #payer {
+    margin-top: 1rem;
+    background-color: var(--rose-foncé);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  #payer:hover {
+    background-color: #c2185b;
+    transform: scale(1.05);
+  }
+  

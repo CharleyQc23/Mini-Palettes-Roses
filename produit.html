@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Produit - Mini Palettes Roses</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="banniere">
+  <h1>Mini Palettes Roses</h1>
+  <p><a href="index.html" style="color:var(--rose-clair); text-decoration:none;">← Retour à la boutique</a></p>
+</header>
+
+<main style="padding: 2rem; max-width: 600px; margin: auto;">
+  <div id="contenu-produit">
+    <!-- Chargement dynamique des infos produit ici -->
+    <h2>Chargement...</h2>
+  </div>
+</main>
+
+<script>
+    // Récupérer paramètre id dans l'URL
+    function getParametre(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+  
+    const idProduit = getParametre('id');
+    const contenu = document.getElementById('contenu-produit');
+  
+    // Charger produits.html et construire catalogue
+    fetch('produits.html')
+      .then(res => res.text())
+      .then(html => {
+        // Créer un DOM virtuel pour parser
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+  
+        const produitsNodes = doc.querySelectorAll('.produit');
+  
+        // Construire catalogue : clé = id formatté, valeur = objet produit
+        const catalogue = {};
+        produitsNodes.forEach(prod => {
+          const nom = prod.dataset.nom;
+          const prix = parseFloat(prod.dataset.prix);
+          const img = prod.querySelector('img');
+          const id = nom.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+  
+          catalogue[id] = {
+            nom,
+            prix,
+            description: "Description à compléter ici.", // tu peux améliorer ce point si besoin
+            image: img.src
+          };
+        });
+  
+        // Afficher le produit ou message d'erreur
+        const produit = catalogue[idProduit];
+        if (produit) {
+          contenu.innerHTML = `
+            <h2>${produit.nom}</h2>
+            <img src="${produit.image}" alt="${produit.nom}" style="width:100%;border-radius:15px;" />
+            <p>${produit.description}</p>
+            <p style="font-weight:bold; font-size:1.5rem; color: var(--rose-foncé);">${produit.prix.toFixed(2)} $</p>
+            <button class="btn-ajouter" id="btn-ajouter-produit">Ajouter au panier</button>
+          `;
+  
+          document.getElementById('btn-ajouter-produit').addEventListener('click', () => {
+            let panier = JSON.parse(localStorage.getItem('panier')) || [];
+            panier.push({ nom: produit.nom, prix: produit.prix });
+            localStorage.setItem('panier', JSON.stringify(panier));
+            alert(`Ajouté au panier : ${produit.nom} pour ${produit.prix.toFixed(2)} $`);
+          });
+        } else {
+          contenu.innerHTML = '<p>Produit non trouvé.</p>';
+        }
+      })
+      .catch(() => {
+        contenu.innerHTML = '<p>Erreur lors du chargement du catalogue.</p>';
+      });
+  </script>  
+
+</body>
+</html>
