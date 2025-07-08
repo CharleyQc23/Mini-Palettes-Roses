@@ -6,12 +6,53 @@
   <title>Mini Palettes Roses - Boutique</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Exemple rapide pour la galerie */
+    #galerie-produits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .produit {
+      width: 200px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 0.5rem;
+      text-align: center;
+      background: #fff0f6;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .produit img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .lien-produit {
+      color: inherit;
+      text-decoration: none;
+    }
+    .btn-ajouter {
+      margin-top: 0.5rem;
+      padding: 0.4rem 0.8rem;
+      background-color: #e91e63;
+      border: none;
+      color: white;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+    .btn-ajouter:hover {
+      background-color: #c2185b;
+    }
+  </style>
 </head>
 <body>
 
 <header class="banniere">
   <h1>Mini Palettes Roses</h1>
-  <p>Vêtements personnalisés en rose et blanc</p>
+  <p>Vêtements pour nos futures Palettes Roses!</p>
 </header>
 
 <button id="btn-panier" title="Voir le panier">🛒 Panier (<span id="nb-items">0</span>)</button>
@@ -32,12 +73,10 @@
   // Panier en mémoire
   let panier = JSON.parse(localStorage.getItem('panier')) || [];
 
-  // Met à jour compteur panier
   function majNbItems() {
     document.getElementById('nb-items').textContent = panier.length;
   }
 
-  // Affiche le panier dans la sidebar
   function afficherPanier() {
     const liste = document.getElementById('liste-panier');
     liste.innerHTML = '';
@@ -45,19 +84,11 @@
     panier.forEach(item => {
       total += item.prix;
       const li = document.createElement('li');
-      li.textContent = `${item.nom} - ${item.prix.toFixed(2)} $`;
+      li.textContent = `${item.nom} (${item.taille || "?"}, ${item.personnalisation || "aucune"}) - ${item.prix.toFixed(2)} $`;
       liste.appendChild(li);
     });
     document.getElementById('total').textContent = total.toFixed(2);
     majNbItems();
-  }
-
-  // Ajoute au panier et sauvegarde localStorage
-  function ajouterAuPanier(nom, prix) {
-    panier.push({ nom, prix });
-    localStorage.setItem('panier', JSON.stringify(panier));
-    afficherPanier();
-    alert(`Ajouté au panier : ${nom} pour ${prix.toFixed(2)} $`);
   }
 
   // Gestion sidebar panier
@@ -72,51 +103,43 @@
     sidebarPanier.classList.remove('open');
   });
 
-  // Chargement produits depuis 'produits.html'
-  fetch('produits.html')
-    .then(res => res.text())
-    .then(html => {
+  // Chargement des produits depuis produits.json
+  fetch('produits.json')
+    .then(res => res.json())
+    .then(produits => {
       const container = document.getElementById('galerie-produits');
-      container.innerHTML = html;
+      container.innerHTML = '';
 
-      // Pour chaque produit, on ajoute lien vers produit.html avec id + bouton ajouter
-      document.querySelectorAll('.produit').forEach(produit => {
-        const nom = produit.dataset.nom;
-        const prix = parseFloat(produit.dataset.prix);
+      for (const idProduit in produits) {
+        const p = produits[idProduit];
 
-        // Créer un lien vers produit.html?id=nom-formaté (ex: tshirt-rose)
-        const idProduit = nom.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-        const lien = document.createElement('a');
-        lien.href = `produit.html?id=${idProduit}`;
-        lien.className = 'lien-produit';
+        const divProduit = document.createElement('div');
+        divProduit.className = 'produit';
+        divProduit.dataset.nom = p.nom;
+        divProduit.dataset.prix = p.prix;
 
-        // Récupérer image, titre, prix pour les mettre dans le lien
-        const img = produit.querySelector('img');
-        const h3 = produit.querySelector('h3');
-        const pPrix = produit.querySelector('p');
+        divProduit.innerHTML = `
+          <a href="produit.html?id=${idProduit}" class="lien-produit">
+            <img src="${p.image}" alt="${p.nom}" />
+            <h3>${p.nom}</h3>
+            <p>${p.prix.toFixed(2)} $</p>
+          </a>
+          <button class="btn-ajouter">Ajouter au panier</button>
+        `;
 
-        lien.appendChild(img.cloneNode(true));
-        lien.appendChild(h3.cloneNode(true));
-        lien.appendChild(pPrix.cloneNode(true));
+        // Le bouton "Ajouter" redirige vers la page produit pour sélection taille/personnalisation
+        divProduit.querySelector('.btn-ajouter').addEventListener('click', () => {
+          window.location.href = `produit.html?id=${idProduit}`;
+        });
 
-        // Nettoyer le produit, ajouter lien + bouton
-        produit.innerHTML = '';
-        produit.appendChild(lien);
-
-        const btnAjouter = document.createElement('button');
-        btnAjouter.className = 'btn-ajouter';
-        btnAjouter.textContent = 'Ajouter au panier';
-        btnAjouter.addEventListener('click', () => ajouterAuPanier(nom, prix));
-        produit.appendChild(btnAjouter);
-      });
+        container.appendChild(divProduit);
+      }
     });
 
-  // Initialiser l’affichage du panier
   afficherPanier();
 
-  // Pour le bouton payer (sans intégration Stripe ici)
   document.getElementById('payer').addEventListener('click', () => {
-    alert('Paiement non encore intégré.');
+    window.location.href = 'confirmation.html';
   });
 </script>
 

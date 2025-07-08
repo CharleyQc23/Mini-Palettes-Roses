@@ -11,6 +11,7 @@
     font-family: 'Poppins', sans-serif;
     background-color: var(--rose-clair);
     color: var(--rose-foncé);
+    overflow-x: hidden;
   }
   
   /* 🧁 Bannière */
@@ -98,40 +99,96 @@
     transform: scale(1.05);
   }
   
-  /* 🛒 Panier */
-  #panier {
-    padding: 2rem;
-    background-color: var(--gris);
+  /* 🛒 Bouton fixe pour ouvrir le panier */
+  #btn-panier {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: var(--rose-foncé);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
   }
   
-  #panier h2 {
-    margin-top: 0;
+  #btn-panier:hover {
+    background-color: #c2185b;
   }
   
-  #panier ul {
+  /* 🧾 Sidebar panier */
+  #sidebar-panier {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100%;
+    background-color: var(--blanc);
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15);
+    padding: 2rem 1.5rem;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 999;
+    overflow-y: auto;
+  }
+  
+  #sidebar-panier.open {
+    transform: translateX(0);
+  }
+  
+  /* ❌ Bouton fermer */
+  #btn-fermer-panier {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--rose-foncé);
+  }
+  
+  /* 📝 Contenu du panier */
+  #sidebar-panier h2 {
+    margin-top: 2rem;
+    color: var(--rose-foncé);
+    font-size: 1.6rem;
+    text-align: center;
+  }
+  
+  #sidebar-panier ul {
     list-style: none;
     padding: 0;
+    margin: 1rem 0;
   }
   
-  #panier li {
+  #sidebar-panier li {
     margin-bottom: 0.5rem;
+    font-size: 1rem;
+    color: #555;
   }
   
   /* 💳 Bouton Paiement */
   #payer {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    width: 100%;
     background-color: var(--rose-foncé);
     color: white;
     border: none;
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem;
     border-radius: 30px;
     font-weight: bold;
     cursor: pointer;
+    font-size: 1.1rem;
     transition: background-color 0.3s ease, transform 0.2s ease;
   }
   
   #payer:hover {
     background-color: #c2185b;
-    transform: scale(1.05);
+    transform: scale(1.03);
   }
   

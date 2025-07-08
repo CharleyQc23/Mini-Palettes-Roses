@@ -1,0 +1,66 @@
+<!-- confirmation.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Confirmation de commande</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    main {
+      max-width: 700px;
+      margin: 2rem auto;
+      background-color: var(--blanc);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+
+<header class="banniere">
+  <h1>Mini Palettes Roses</h1>
+  <p>Confirmation de commande</p>
+</header>
+
+<main>
+  <h2>Merci pour ta commande ! 💖</h2>
+  <p>Voici le résumé :</p>
+  <ul id="recap-commande"></ul>
+  <p><strong>Total : <span id="total-final">0.00</span> $</strong></p>
+  <button class="btn-retour" onclick="window.location.href='index.html'">Retour à l'accueil</button>
+</main>
+
+<script>
+  const panier = JSON.parse(localStorage.getItem('panier')) || [];
+  const recap = document.getElementById('recap-commande');
+  const totalSpan = document.getElementById('total-final');
+  let total = 0;
+
+  if (panier.length === 0) {
+    recap.innerHTML = "<li>Ton panier était vide.</li>";
+  } else {
+    panier.forEach(item => {
+      total += item.prix;
+      const li = document.createElement('li');
+      li.textContent = `${item.nom} (${item.taille}) - ${item.prix.toFixed(2)} $`;
+      recap.appendChild(li);
+    });
+  }
+
+  totalSpan.textContent = total.toFixed(2);
+  localStorage.removeItem('panier'); // vider le panier après confirmation
+</script>
+
+</body>
+</html>

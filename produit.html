@@ -3,84 +3,200 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Produit - Mini Palettes Roses</title>
+  <title>Mini Palettes Roses - Détail produit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Styles simplifiés pour la fiche produit */
+    .contenu-produit {
+      max-width: 700px;
+      margin: 2rem auto;
+      background: var(--blanc);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .contenu-produit img {
+      max-width: 100%;
+      border-radius: 15px;
+    }
+    select, button {
+      margin-top: 1rem;
+      padding: 0.6rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    .btn-ajouter {
+      background-color: var(--rose-foncé);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+      transition: background-color 0.3s ease;
+      margin-top: 1rem;
+    }
+    .btn-ajouter:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .btn-retour {
+      margin-top: 2rem;
+      background-color: var(--gris);
+      border: none;
+      color: var(--rose-foncé);
+      font-weight: bold;
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      display: inline-block;
+    }
+    .btn-retour:hover {
+      background-color: var(--rose);
+    }
+  </style>
 </head>
 <body>
 
 <header class="banniere">
   <h1>Mini Palettes Roses</h1>
-  <p><a href="index.html" style="color:var(--rose-clair); text-decoration:none;">← Retour à la boutique</a></p>
+  <p>Détails du produit</p>
 </header>
 
-<main style="padding: 2rem; max-width: 600px; margin: auto;">
-  <div id="contenu-produit">
-    <!-- Chargement dynamique des infos produit ici -->
-    <h2>Chargement...</h2>
+<button id="btn-panier" title="Voir le panier">🛒 Panier (<span id="nb-items">0</span>)</button>
+
+<div id="sidebar-panier" class="sidebar-closed">
+  <button id="btn-fermer-panier">✖</button>
+  <h2>Ton panier</h2>
+  <ul id="liste-panier"></ul>
+  <p><strong>Total : <span id="total">0.00</span> $</strong></p>
+  <button id="payer">Procéder au paiement</button>
+</div>
+
+<main>
+  <div class="contenu-produit" id="fiche-produit">
+    <h2>Chargement du produit...</h2>
   </div>
 </main>
 
 <script>
-    // Récupérer paramètre id dans l'URL
-    function getParametre(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
-  
-    const idProduit = getParametre('id');
-    const contenu = document.getElementById('contenu-produit');
-  
-    // Charger produits.html et construire catalogue
-    fetch('produits.html')
-      .then(res => res.text())
-      .then(html => {
-        // Créer un DOM virtuel pour parser
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-  
-        const produitsNodes = doc.querySelectorAll('.produit');
-  
-        // Construire catalogue : clé = id formatté, valeur = objet produit
-        const catalogue = {};
-        produitsNodes.forEach(prod => {
-          const nom = prod.dataset.nom;
-          const prix = parseFloat(prod.dataset.prix);
-          const img = prod.querySelector('img');
-          const id = nom.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-  
-          catalogue[id] = {
-            nom,
-            prix,
-            description: "Description à compléter ici.", // tu peux améliorer ce point si besoin
-            image: img.src
-          };
+  // Panier en mémoire
+  let panier = JSON.parse(localStorage.getItem('panier')) || [];
+
+  // Mise à jour compteur panier
+  function majNbItems() {
+    document.getElementById('nb-items').textContent = panier.length;
+  }
+
+  // Affiche panier dans sidebar
+  function afficherPanier() {
+    const liste = document.getElementById('liste-panier');
+    liste.innerHTML = '';
+    let total = 0;
+    panier.forEach(item => {
+      total += item.prix;
+      const li = document.createElement('li');
+      li.textContent = `${item.nom} (${item.taille || '?'}, ${item.personnalisation || 'aucune'}) - ${item.prix.toFixed(2)} $`;
+      liste.appendChild(li);
+    });
+    document.getElementById('total').textContent = total.toFixed(2);
+    majNbItems();
+  }
+
+  // Sidebar panier toggle
+  document.getElementById('btn-panier').addEventListener('click', () => {
+    document.getElementById('sidebar-panier').classList.toggle('open');
+  });
+  document.getElementById('btn-fermer-panier').addEventListener('click', () => {
+    document.getElementById('sidebar-panier').classList.remove('open');
+  });
+
+  // Récupérer id produit depuis URL
+  const params = new URLSearchParams(window.location.search);
+  const idProduit = params.get('id');
+
+  // Charger produits depuis JSON
+  fetch('produits.json')
+    .then(res => res.json())
+    .then(produits => {
+      if (!idProduit || !produits[idProduit]) {
+        document.getElementById('fiche-produit').innerHTML = '<p>Produit introuvable.</p>';
+        return;
+      }
+
+      const produit = produits[idProduit];
+      const div = document.getElementById('fiche-produit');
+      div.innerHTML = `
+        <img src="${produit.image}" alt="${produit.nom}" />
+        <h2>${produit.nom}</h2>
+        <p><strong>${produit.prix.toFixed(2)} $</strong></p>
+
+        <label for="taille">Choisis une grandeur :</label><br>
+        <select id="taille">
+          <option value="">-- Sélectionner --</option>
+          <option value="X-Small">X-Small</option>
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large">Large</option>
+          <option value="X-Large">X-Large</option>
+        </select><br><br>
+
+        <label for="perso">Choisis une personnalisation :</label><br>
+        <select id="perso">
+          <option value="">-- Sélectionner --</option>
+          <option value="Aucune|0">Aucune (+0.00 $)</option>
+          <option value="Broderie NOM|7">Broderie NOM (+7.00 $)</option>
+          <option value="Broderie NUMÉRO|5.5">Broderie NUMÉRO (+5.50 $)</option>
+          <option value="Broderie NOM et NUMÉRO|10">Broderie NOM et NUMÉRO (+10.00 $)</option>
+        </select><br><br>
+
+        <button id="ajouter-panier" class="btn-ajouter" disabled>Ajouter au panier</button><br>
+
+        <button class="btn-retour" onclick="window.location.href='index.html'">← Retour à l'accueil</button>
+      `;
+
+      const selectTaille = document.getElementById('taille');
+      const selectPerso = document.getElementById('perso');
+      const boutonAjouter = document.getElementById('ajouter-panier');
+
+      function checkReady() {
+        boutonAjouter.disabled = (selectTaille.value === '' || selectPerso.value === '');
+      }
+
+      selectTaille.addEventListener('change', checkReady);
+      selectPerso.addEventListener('change', checkReady);
+
+      boutonAjouter.addEventListener('click', () => {
+        const taille = selectTaille.value;
+        const [persoText, persoPrix] = selectPerso.value.split('|');
+        const prixFinal = produit.prix + parseFloat(persoPrix);
+
+        panier.push({
+          nom: produit.nom,
+          prix: prixFinal,
+          taille: taille,
+          personnalisation: persoText
         });
-  
-        // Afficher le produit ou message d'erreur
-        const produit = catalogue[idProduit];
-        if (produit) {
-          contenu.innerHTML = `
-            <h2>${produit.nom}</h2>
-            <img src="${produit.image}" alt="${produit.nom}" style="width:100%;border-radius:15px;" />
-            <p>${produit.description}</p>
-            <p style="font-weight:bold; font-size:1.5rem; color: var(--rose-foncé);">${produit.prix.toFixed(2)} $</p>
-            <button class="btn-ajouter" id="btn-ajouter-produit">Ajouter au panier</button>
-          `;
-  
-          document.getElementById('btn-ajouter-produit').addEventListener('click', () => {
-            let panier = JSON.parse(localStorage.getItem('panier')) || [];
-            panier.push({ nom: produit.nom, prix: produit.prix });
-            localStorage.setItem('panier', JSON.stringify(panier));
-            alert(`Ajouté au panier : ${produit.nom} pour ${produit.prix.toFixed(2)} $`);
-          });
-        } else {
-          contenu.innerHTML = '<p>Produit non trouvé.</p>';
-        }
-      })
-      .catch(() => {
-        contenu.innerHTML = '<p>Erreur lors du chargement du catalogue.</p>';
+        localStorage.setItem('panier', JSON.stringify(panier));
+        afficherPanier();
+        alert(`Ajouté : ${produit.nom} (${taille}, ${persoText}) pour ${prixFinal.toFixed(2)} $`);
       });
-  </script>  
+
+      afficherPanier();
+    });
+
+  // Paiement redirection
+  document.getElementById('payer').addEventListener('click', () => {
+    window.location.href = 'confirmation.html';
+  });
+
+  // Affichage initial panier
+  afficherPanier();
+  majNbItems();
+</script>
 
 </body>
 </html>

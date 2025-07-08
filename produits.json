@@ -1,0 +1,18 @@
+{
+    "pantalon-noir": {
+      "nom": "Pantalon noir sport",
+      "prix": 47,
+      "image": "images/pantalon-noir.png"
+    },
+    "kangourou-blanc": {
+      "nom": "Kangourou blanc",
+      "prix": 39,
+      "image": "images/kangourou-blanc.png"
+    },
+    "casquette": {
+      "nom": "Casquette personnalisée",
+      "prix": 20,
+      "image": "images/casquette.jpg"
+    }
+  }
+  
