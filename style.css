@@ -192,3 +192,15 @@
     transform: scale(1.03);
   }
   
+  .btn-supprimer {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 1rem;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  .btn-supprimer:hover {
+    color: darkred;
+  }
+  

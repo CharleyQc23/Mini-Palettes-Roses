@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* Exemple rapide pour la galerie */
     #galerie-produits {
       display: flex;
       flex-wrap: wrap;
@@ -46,6 +45,13 @@
     .btn-ajouter:hover {
       background-color: #c2185b;
     }
+    .btn-supprimer {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #c2185b;
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -62,6 +68,7 @@
   <h2>Ton panier</h2>
   <ul id="liste-panier"></ul>
   <p><strong>Total : <span id="total">0.00</span> $</strong></p>
+  <button id="vider-panier">🧹 Vider le panier</button>
   <button id="payer">Procéder au paiement</button>
 </div>
 
@@ -70,7 +77,6 @@
 </main>
 
 <script>
-  // Panier en mémoire
   let panier = JSON.parse(localStorage.getItem('panier')) || [];
 
   function majNbItems() {
@@ -81,29 +87,42 @@
     const liste = document.getElementById('liste-panier');
     liste.innerHTML = '';
     let total = 0;
-    panier.forEach(item => {
+
+    panier.forEach((item, index) => {
       total += item.prix;
       const li = document.createElement('li');
-      li.textContent = `${item.nom} (${item.taille || "?"}, ${item.personnalisation || "aucune"}) - ${item.prix.toFixed(2)} $`;
+      li.innerHTML = `${item.nom} (${item.taille || "?"}, ${item.personnalisation || "aucune"}) - ${item.prix.toFixed(2)} $ <button class="btn-supprimer" data-index="${index}" title="Supprimer">🗑️</button>`;
       liste.appendChild(li);
     });
+
     document.getElementById('total').textContent = total.toFixed(2);
     majNbItems();
+
+    document.querySelectorAll('.btn-supprimer').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const i = parseInt(e.target.dataset.index);
+        panier.splice(i, 1);
+        localStorage.setItem('panier', JSON.stringify(panier));
+        afficherPanier();
+      });
+    });
   }
 
-  // Gestion sidebar panier
-  const btnPanier = document.getElementById('btn-panier');
-  const sidebarPanier = document.getElementById('sidebar-panier');
-  const btnFermerPanier = document.getElementById('btn-fermer-panier');
-
-  btnPanier.addEventListener('click', () => {
-    sidebarPanier.classList.toggle('open');
+  document.getElementById('btn-panier').addEventListener('click', () => {
+    document.getElementById('sidebar-panier').classList.toggle('open');
   });
-  btnFermerPanier.addEventListener('click', () => {
-    sidebarPanier.classList.remove('open');
+  document.getElementById('btn-fermer-panier').addEventListener('click', () => {
+    document.getElementById('sidebar-panier').classList.remove('open');
   });
 
-  // Chargement des produits depuis produits.json
+  document.getElementById('vider-panier').addEventListener('click', () => {
+    if (confirm("Vider tout le panier ?")) {
+      panier = [];
+      localStorage.setItem('panier', JSON.stringify(panier));
+      afficherPanier();
+    }
+  });
+
   fetch('produits.json')
     .then(res => res.json())
     .then(produits => {
@@ -112,12 +131,10 @@
 
       for (const idProduit in produits) {
         const p = produits[idProduit];
-
         const divProduit = document.createElement('div');
         divProduit.className = 'produit';
         divProduit.dataset.nom = p.nom;
         divProduit.dataset.prix = p.prix;
-
         divProduit.innerHTML = `
           <a href="produit.html?id=${idProduit}" class="lien-produit">
             <img src="${p.image}" alt="${p.nom}" />
@@ -127,7 +144,6 @@
           <button class="btn-ajouter">Ajouter au panier</button>
         `;
 
-        // Le bouton "Ajouter" redirige vers la page produit pour sélection taille/personnalisation
         divProduit.querySelector('.btn-ajouter').addEventListener('click', () => {
           window.location.href = `produit.html?id=${idProduit}`;
         });

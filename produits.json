@@ -9,10 +9,10 @@
       "prix": 39,
       "image": "images/kangourou-blanc.png"
     },
-    "casquette": {
-      "nom": "Casquette personnalisée",
-      "prix": 20,
-      "image": "images/casquette.jpg"
+    "kangourou-noir": {
+      "nom": "Kangourou noir",
+      "prix": 47,
+      "image": "images/kangourou-noir.png"
     }
   }
   

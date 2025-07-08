@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* Styles simplifiés pour la fiche produit */
     .contenu-produit {
       max-width: 700px;
       margin: 2rem auto;
@@ -52,10 +51,31 @@
       border-radius: 30px;
       cursor: pointer;
       transition: background-color 0.3s ease;
-      display: inline-block;
     }
     .btn-retour:hover {
       background-color: var(--rose);
+    }
+    .btn-supprimer {
+      background: none;
+      border: none;
+      color: red;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-left: 0.5rem;
+    }
+    .btn-vider {
+      background-color: #f06292;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+    .btn-vider:hover {
+      background-color: #d81b60;
     }
   </style>
 </head>
@@ -73,6 +93,7 @@
   <h2>Ton panier</h2>
   <ul id="liste-panier"></ul>
   <p><strong>Total : <span id="total">0.00</span> $</strong></p>
+  <button id="vider-panier" class="btn-vider">🧹 Vider le panier</button>
   <button id="payer">Procéder au paiement</button>
 </div>
 
@@ -83,30 +104,39 @@
 </main>
 
 <script>
-  // Panier en mémoire
   let panier = JSON.parse(localStorage.getItem('panier')) || [];
 
-  // Mise à jour compteur panier
   function majNbItems() {
     document.getElementById('nb-items').textContent = panier.length;
   }
 
-  // Affiche panier dans sidebar
   function afficherPanier() {
     const liste = document.getElementById('liste-panier');
     liste.innerHTML = '';
     let total = 0;
-    panier.forEach(item => {
+
+    panier.forEach((item, index) => {
       total += item.prix;
       const li = document.createElement('li');
-      li.textContent = `${item.nom} (${item.taille || '?'}, ${item.personnalisation || 'aucune'}) - ${item.prix.toFixed(2)} $`;
+      li.innerHTML = `${item.nom} (${item.taille}, ${item.personnalisation}) - ${item.prix.toFixed(2)} $
+        <button class="btn-supprimer" data-index="${index}">🗑️</button>`;
       liste.appendChild(li);
     });
+
     document.getElementById('total').textContent = total.toFixed(2);
     majNbItems();
+
+    document.querySelectorAll('.btn-supprimer').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const i = parseInt(e.target.dataset.index);
+        panier.splice(i, 1);
+        localStorage.setItem('panier', JSON.stringify(panier));
+        afficherPanier();
+      });
+    });
   }
 
-  // Sidebar panier toggle
+  // Sidebar toggle
   document.getElementById('btn-panier').addEventListener('click', () => {
     document.getElementById('sidebar-panier').classList.toggle('open');
   });
@@ -114,11 +144,24 @@
     document.getElementById('sidebar-panier').classList.remove('open');
   });
 
-  // Récupérer id produit depuis URL
+  // Vider le panier
+  document.getElementById('vider-panier').addEventListener('click', () => {
+    if (confirm("Es-tu sûr(e) de vouloir vider ton panier ?")) {
+      panier = [];
+      localStorage.setItem('panier', JSON.stringify(panier));
+      afficherPanier();
+    }
+  });
+
+  // Paiement
+  document.getElementById('payer').addEventListener('click', () => {
+    window.location.href = 'confirmation.html';
+  });
+
+  // Charger le produit
   const params = new URLSearchParams(window.location.search);
   const idProduit = params.get('id');
 
-  // Charger produits depuis JSON
   fetch('produits.json')
     .then(res => res.json())
     .then(produits => {
@@ -144,17 +187,16 @@
           <option value="X-Large">X-Large</option>
         </select><br><br>
 
-        <label for="perso">Choisis une personnalisation :</label><br>
+        <label for="perso">Personnalisation :</label><br>
         <select id="perso">
           <option value="">-- Sélectionner --</option>
-          <option value="Aucune|0">Aucune (+0.00 $)</option>
+          <option value="Aucune|0">Aucune (0$)</option>
           <option value="Broderie NOM|7">Broderie NOM (+7.00 $)</option>
           <option value="Broderie NUMÉRO|5.5">Broderie NUMÉRO (+5.50 $)</option>
           <option value="Broderie NOM et NUMÉRO|10">Broderie NOM et NUMÉRO (+10.00 $)</option>
         </select><br><br>
 
         <button id="ajouter-panier" class="btn-ajouter" disabled>Ajouter au panier</button><br>
-
         <button class="btn-retour" onclick="window.location.href='index.html'">← Retour à l'accueil</button>
       `;
 
@@ -180,6 +222,7 @@
           taille: taille,
           personnalisation: persoText
         });
+
         localStorage.setItem('panier', JSON.stringify(panier));
         afficherPanier();
         alert(`Ajouté : ${produit.nom} (${taille}, ${persoText}) pour ${prixFinal.toFixed(2)} $`);
@@ -188,12 +231,7 @@
       afficherPanier();
     });
 
-  // Paiement redirection
-  document.getElementById('payer').addEventListener('click', () => {
-    window.location.href = 'confirmation.html';
-  });
-
-  // Affichage initial panier
+  // Init
   afficherPanier();
   majNbItems();
 </script>
