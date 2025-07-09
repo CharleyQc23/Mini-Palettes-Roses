@@ -203,4 +203,99 @@
   .btn-supprimer:hover {
     color: darkred;
   }
-  
+  #vider-panier {
+  margin-top: 0.7rem;
+  padding: 0.6rem 1rem;
+  background-color: var(--rose-foncé, #e91e63);
+  border: 2px solid transparent;
+  color: white;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#vider-panier:hover {
+  background-color: #c2185b;
+  transform: scale(1.03);
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+#btn-panier.pop {
+  animation: pop 0.3s ease;
+}
+
+.section-contact {
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background-color: #fff0f6;
+  border-radius: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.section-contact h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--rose-foncé, #e91e63);
+  font-family: 'Pacifico', cursive;
+}
+
+.form-contact label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.form-contact input,
+.form-contact textarea {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.3rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.btn-envoyer {
+  margin-top: 1.5rem;
+  background-color: var(--rose-foncé, #e91e63);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: block;
+  width: 100%;
+}
+
+.btn-envoyer:hover {
+  background-color: #c2185b;
+}
+
+.btn-contact {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--rose-foncé, #e91e63);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* ✅ l’ombre douce */
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-contact:hover {
+  background-color: #c2185b;
+  transform: scale(1.03);
+}

@@ -5,6 +5,20 @@ function ajouterAuPanier(nom, prix) {
   afficherPanier();
 }
 
+// Ajoute ce code juste après l’ajout au panier
+const btn = document.getElementById('ajouter-panier');
+btn.textContent = '✔️ Ajouté !';
+btn.disabled = true;
+setTimeout(() => {
+  btn.textContent = 'Ajouter au panier';
+  btn.disabled = false;
+}, 1200);
+
+document.getElementById('btn-panier').classList.add('pop');
+setTimeout(() => {
+  document.getElementById('btn-panier').classList.remove('pop');
+}, 300);
+
 function afficherPanier() {
   const liste = document.getElementById('liste-panier');
   liste.innerHTML = '';
