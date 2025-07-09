@@ -82,11 +82,20 @@
 }
   </style>
 </head>
+
 <body>
 
 <header class="banniere">
-  <h1>Mini Palettes Roses</h1>
-  <p>Détails du produit</p>
+  <div class="entete-logo-texte">
+    <a href="index.html">
+      <img src="images/MPR_logo_FINAL-vectorise.png" alt="Logo Mini Palettes Roses" class="logo-site">
+    </a>
+    <div>
+      <h1>Mini Palettes Roses</h1>
+      <p>La boutique officielle de nos futures Palettes Roses!</p>
+    </div>
+  </div>
+  <a href="contact.html" class="btn-contact">📩 Nous rejoindre</a>
 </header>
 
 <button id="btn-panier" title="Voir le panier">🛒 Panier (<span id="nb-items">0</span>)</button>
@@ -175,62 +184,71 @@
 
       const produit = produits[idProduit];
       const div = document.getElementById('fiche-produit');
-      div.innerHTML = `
-        <img src="${produit.image}" alt="${produit.nom}" />
-        <h2>${produit.nom}</h2>
-        <p><strong>${produit.prix.toFixed(2)} $</strong></p>
+div.innerHTML = `
+  <img src="${produit.image}" alt="${produit.nom}" />
+  <h2>${produit.nom}</h2>
+  <p><strong>${produit.prix.toFixed(2)} $</strong></p>
 
-        <label for="taille">Choisis une grandeur :</label><br>
-        <select id="taille">
-          <option value="">-- Sélectionner --</option>
-          <option value="X-Small">X-Small</option>
-          <option value="Small">Small</option>
-          <option value="Medium">Medium</option>
-          <option value="Large">Large</option>
-          <option value="X-Large">X-Large</option>
-        </select><br><br>
+  <label for="taille">Choisis une grandeur :</label><br>
+  <select id="taille">
+    <option value="">-- Sélectionner --</option>
+    <option value="X-Small">X-Small</option>
+    <option value="Small">Small</option>
+    <option value="Medium">Medium</option>
+    <option value="Large">Large</option>
+    <option value="X-Large">X-Large</option>
+  </select><br><br>
 
-        <label for="perso">Personnalisation :</label><br>
-        <select id="perso">
-          <option value="">-- Sélectionner --</option>
-          <option value="Aucune|0">Aucune (0$)</option>
-          <option value="Broderie NOM|7">Broderie NOM (+7.00 $)</option>
-          <option value="Broderie NUMÉRO|5.5">Broderie NUMÉRO (+5.50 $)</option>
-          <option value="Broderie NOM et NUMÉRO|10">Broderie NOM et NUMÉRO (+10.00 $)</option>
-        </select><br><br>
+  <label for="perso">Personnalisation :</label><br>
+  <select id="perso">
+    <option value="">-- Sélectionner --</option>
+    <option value="Aucune|0">Aucune (0$)</option>
+    <option value="Broderie NOM|7">Broderie NOM (+7.00 $)</option>
+    <option value="Broderie NUMÉRO|5.5">Broderie NUMÉRO (+5.50 $)</option>
+    <option value="Broderie NOM et NUMÉRO|10">Broderie NOM et NUMÉRO (+10.00 $)</option>
+  </select><br><br>
 
-        <button id="ajouter-panier" class="btn-ajouter" disabled>Ajouter au panier</button><br>
-        <button class="btn-retour" onclick="window.location.href='index.html'">← Retour à l'accueil</button>
-      `;
+  <label for="quantite">Quantité :</label><br>
+  <input type="number" id="quantite" name="quantite" min="1" value="1" style="width: 60px; padding: 0.3rem; border-radius: 6px; border: 1px solid #ccc;" /><br><br>
 
-      const selectTaille = document.getElementById('taille');
-      const selectPerso = document.getElementById('perso');
-      const boutonAjouter = document.getElementById('ajouter-panier');
+  <button id="ajouter-panier" class="btn-ajouter" disabled>Ajouter au panier</button><br>
+  <button class="btn-retour" onclick="window.location.href='index.html'">← Retour à l'accueil</button>
+`;
 
-      function checkReady() {
-        boutonAjouter.disabled = (selectTaille.value === '' || selectPerso.value === '');
-      }
+const selectTaille = document.getElementById('taille');
+const selectPerso = document.getElementById('perso');
+const inputQuantite = document.getElementById('quantite');
+const boutonAjouter = document.getElementById('ajouter-panier');
 
-      selectTaille.addEventListener('change', checkReady);
-      selectPerso.addEventListener('change', checkReady);
+function checkReady() {
+  const qte = parseInt(inputQuantite.value);
+  boutonAjouter.disabled = (selectTaille.value === '' || selectPerso.value === '' || !qte || qte < 1);
+}
 
-      boutonAjouter.addEventListener('click', () => {
-        const taille = selectTaille.value;
-        const [persoText, persoPrix] = selectPerso.value.split('|');
-        const prixFinal = produit.prix + parseFloat(persoPrix);
+selectTaille.addEventListener('change', checkReady);
+selectPerso.addEventListener('change', checkReady);
+inputQuantite.addEventListener('input', checkReady);
 
-        panier.push({
-          nom: produit.nom,
-          prix: prixFinal,
-          taille: taille,
-          personnalisation: persoText
-        });
+boutonAjouter.addEventListener('click', () => {
+  const taille = selectTaille.value;
+  const [persoText, persoPrix] = selectPerso.value.split('|');
+  const quantite = parseInt(inputQuantite.value);
+  const prixUnitaire = produit.prix + parseFloat(persoPrix);
+  const prixFinal = prixUnitaire * quantite;
 
-        localStorage.setItem('panier', JSON.stringify(panier));
-        afficherPanier();
-        alert(`Ajouté : ${produit.nom} (${taille}, ${persoText}) pour ${prixFinal.toFixed(2)} $`);
-      });
+  panier.push({
+    nom: produit.nom,
+    prix: prixFinal,
+    taille: taille,
+    personnalisation: persoText,
+    quantite: quantite,
+    prixUnitaire: prixUnitaire
+  });
 
+  localStorage.setItem('panier', JSON.stringify(panier));
+  afficherPanier();
+  alert(`Ajouté : ${produit.nom} (${taille}, ${persoText}) x${quantite} pour ${prixFinal.toFixed(2)} $`);
+});
       afficherPanier();
     });
 
@@ -238,6 +256,14 @@
   afficherPanier();
   majNbItems();
 </script>
+<div id="footer-container"></div>
 
+<script>
+  fetch('footer.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('footer-container').outerHTML = data;
+    });
+</script>
 </body>
 </html>

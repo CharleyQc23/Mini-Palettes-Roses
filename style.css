@@ -299,3 +299,79 @@
   background-color: #c2185b;
   transform: scale(1.03);
 }
+.entete-logo-texte {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  text-align: left;
+}
+
+.logo-site {
+  height: 115px;
+  width: auto;
+}
+
+.footer {
+  background-color: var(--rose-foncé);
+  color: var(--blanc);
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  margin-top: 3rem;
+}
+
+.footer .contenu-footer p {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+}
+
+.lien-footer {
+  color: var(--rose-clair);
+  text-decoration: none;
+  margin: 0 0.5rem;
+}
+
+.lien-footer:hover {
+  text-decoration: underline;
+  color: white;
+}
+.footer {
+  background-color: var(--rose-foncé);
+  color: white;
+  padding: 1rem 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+  text-align: center; /* Centre le contenu */
+}
+
+.footer-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column; /* Empile verticalement */
+  align-items: center;
+  gap: 0rem; /* Espace entre logo et texte */
+}
+
+.footer-socials a {
+  display: inline-block;
+  transition: opacity 0.3s ease;
+}
+
+.footer-socials a:hover {
+  opacity: 0.7;
+}
+
+.social-icon {
+  width: 32px;
+  height: 32px;
+  filter: invert(1); /* Icône blanche */
+}
+

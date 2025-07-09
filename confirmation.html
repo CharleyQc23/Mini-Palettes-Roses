@@ -26,11 +26,19 @@
     }
   </style>
 </head>
-<body>
 
+<body>
 <header class="banniere">
-  <h1>Mini Palettes Roses</h1>
-  <p>Confirmation de commande</p>
+  <div class="entete-logo-texte">
+    <a href="index.html">
+      <img src="images/MPR_logo_FINAL-vectorise.png" alt="Logo Mini Palettes Roses" class="logo-site">
+    </a>
+    <div>
+      <h1>Mini Palettes Roses</h1>
+      <p>La boutique officielle de nos futures Palettes Roses!</p>
+    </div>
+  </div>
+  <a href="contact.html" class="btn-contact">📩 Nous rejoindre</a>
 </header>
 
 <main>
@@ -61,6 +69,14 @@
   totalSpan.textContent = total.toFixed(2);
   localStorage.removeItem('panier'); // vider le panier après confirmation
 </script>
+<div id="footer-container"></div>
 
+<script>
+  fetch('footer.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('footer-container').outerHTML = data;
+    });
+</script>
 </body>
 </html>
