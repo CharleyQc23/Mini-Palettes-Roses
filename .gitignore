@@ -1,0 +1,23 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# dotenv environment variables file
+.env
+
+# OS files
+.DS_Store
+
+# Optional npm cache folder
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Build output (si tu as un dossier de build)
+dist/
+build/

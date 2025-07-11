@@ -375,3 +375,31 @@
   filter: invert(1); /* Icône blanche */
 }
 
+.bandeau-taxes {
+  background-color: #d81b60;
+  color: white;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+}
+.btn-panier {
+  display: inline-block;
+  background-color: #e91e63;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.btn-panier:hover {
+  background-color: #c2185b;
+}

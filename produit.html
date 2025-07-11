@@ -6,7 +6,10 @@
   <title>Mini Palettes Roses - Détail produit</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script src="https://js.stripe.com/v3/"></script> <!-- Stripe.js -->
+
   <style>
+    /* Ton CSS existant ici (j'ai gardé le même que dans ton code précédent) */
     .contenu-produit {
       max-width: 700px;
       margin: 2rem auto;
@@ -20,7 +23,7 @@
       max-width: 100%;
       border-radius: 15px;
     }
-    select, button {
+    select, button, input[type=number] {
       margin-top: 1rem;
       padding: 0.6rem;
       border-radius: 10px;
@@ -64,26 +67,29 @@
       margin-left: 0.5rem;
     }
     .btn-vider {
-  background-color: white;
-  border: 2px solid var(--rose-foncé);
-  color: var(--rose-foncé);
-  padding: 0.6rem 1rem;
-  border-radius: 30px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 0.95rem;
-  margin-bottom: 1rem;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.btn-vider:hover {
-  background-color: var(--rose-foncé);
-  color: white;
-}
+      background-color: white;
+      border: 2px solid var(--rose-foncé);
+      color: var(--rose-foncé);
+      padding: 0.6rem 1rem;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .btn-vider:hover {
+      background-color: var(--rose-foncé);
+      color: white;
+    }
   </style>
 </head>
 
 <body>
+
+<div class="bandeau-taxes">
+  TOUS LES PRIX INCLUENT LES TAXES
+</div>
 
 <header class="banniere">
   <div class="entete-logo-texte">
@@ -92,7 +98,7 @@
     </a>
     <div>
       <h1>Mini Palettes Roses</h1>
-      <p>La boutique officielle de nos futures Palettes Roses!</p>
+      <p>La boutique officielle des futures Palettes Roses!</p>
     </div>
   </div>
   <a href="contact.html" class="btn-contact">📩 Nous rejoindre</a>
@@ -116,12 +122,15 @@
 </main>
 
 <script>
+  // Récupérer le panier depuis localStorage ou tableau vide
   let panier = JSON.parse(localStorage.getItem('panier')) || [];
 
+  // Mise à jour du nombre d'articles dans le panier (affiché dans le bouton panier)
   function majNbItems() {
     document.getElementById('nb-items').textContent = panier.length;
   }
 
+  // Afficher le contenu du panier dans la sidebar
   function afficherPanier() {
     const liste = document.getElementById('liste-panier');
     liste.innerHTML = '';
@@ -130,14 +139,15 @@
     panier.forEach((item, index) => {
       total += item.prix;
       const li = document.createElement('li');
-      li.innerHTML = `${item.nom} (${item.taille}, ${item.personnalisation}) - ${item.prix.toFixed(2)} $
-        <button class="btn-supprimer" data-index="${index}">🗑️</button>`;
+      li.innerHTML = `${item.nom} (${item.taille}, ${item.personnalisation}) - ${item.prix.toFixed(2)} $ 
+        <button class="btn-supprimer" data-index="${index}" title="Supprimer">🗑️</button>`;
       liste.appendChild(li);
     });
 
     document.getElementById('total').textContent = total.toFixed(2);
     majNbItems();
 
+    // Boutons supprimer article
     document.querySelectorAll('.btn-supprimer').forEach(btn => {
       btn.addEventListener('click', e => {
         const i = parseInt(e.target.dataset.index);
@@ -148,7 +158,7 @@
     });
   }
 
-  // Sidebar toggle
+  // Gestion ouverture/fermeture sidebar panier
   document.getElementById('btn-panier').addEventListener('click', () => {
     document.getElementById('sidebar-panier').classList.toggle('open');
   });
@@ -165,12 +175,35 @@
     }
   });
 
-  // Paiement
-  document.getElementById('payer').addEventListener('click', () => {
-    window.location.href = 'confirmation.html';
+  // Paiement Stripe avec fetch POST vers ton serveur
+  document.getElementById('payer').addEventListener('click', async () => {
+    if (panier.length === 0) {
+      alert("Ton panier est vide !");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:4242/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ panier }),
+      });
+
+      const data = await response.json();
+
+      if (data.id) {
+        const stripe = Stripe('pk_test_51RjVtFPtAYsb0tTKFaXBb3U96XQePm5nInGkVMaubkiqz9tWXLyv2qqQLfLsFQRxUwH2jHzZBp9ZLhA9TR2k1N0a007kRZOPEr'); // clé publique Stripe
+        await stripe.redirectToCheckout({ sessionId: data.id });
+      } else {
+        alert('Erreur lors de la création de la session de paiement.');
+      }
+    } catch (error) {
+      console.error('Erreur paiement:', error);
+      alert('Erreur lors du paiement. Regarde la console.');
+    }
   });
 
-  // Charger le produit
+  // Charger le produit d'après l'id dans l'URL
   const params = new URLSearchParams(window.location.search);
   const idProduit = params.get('id');
 
@@ -184,78 +217,82 @@
 
       const produit = produits[idProduit];
       const div = document.getElementById('fiche-produit');
-div.innerHTML = `
-  <img src="${produit.image}" alt="${produit.nom}" />
-  <h2>${produit.nom}</h2>
-  <p><strong>${produit.prix.toFixed(2)} $</strong></p>
+      div.innerHTML = `
+        <img src="${produit.image}" alt="${produit.nom}" />
+        <h2>${produit.nom}</h2>
+        <p><strong>${produit.prix.toFixed(2)} $</strong></p>
 
-  <label for="taille">Choisis une grandeur :</label><br>
-  <select id="taille">
-    <option value="">-- Sélectionner --</option>
-    <option value="X-Small">X-Small</option>
-    <option value="Small">Small</option>
-    <option value="Medium">Medium</option>
-    <option value="Large">Large</option>
-    <option value="X-Large">X-Large</option>
-  </select><br><br>
+        <label for="taille">Choisis une grandeur :</label><br>
+        <select id="taille">
+          <option value="">-- Sélectionner --</option>
+          <option value="X-Small">X-Small</option>
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large">Large</option>
+          <option value="X-Large">X-Large</option>
+        </select><br><br>
 
-  <label for="perso">Personnalisation :</label><br>
-  <select id="perso">
-    <option value="">-- Sélectionner --</option>
-    <option value="Aucune|0">Aucune (0$)</option>
-    <option value="Broderie NOM|7">Broderie NOM (+7.00 $)</option>
-    <option value="Broderie NUMÉRO|5.5">Broderie NUMÉRO (+5.50 $)</option>
-    <option value="Broderie NOM et NUMÉRO|10">Broderie NOM et NUMÉRO (+10.00 $)</option>
-  </select><br><br>
+        <label for="perso">Personnalisation :</label><br>
+        <select id="perso">
+          <option value="">-- Sélectionner --</option>
+          <option value="Aucune|0">Aucune (0$)</option>
+          <option value="Broderie NOM|7">Broderie NOM (+7.00 $)</option>
+          <option value="Broderie NUMÉRO|5.5">Broderie NUMÉRO (+5.50 $)</option>
+          <option value="Broderie NOM et NUMÉRO|10">Broderie NOM et NUMÉRO (+10.00 $)</option>
+        </select><br><br>
 
-  <label for="quantite">Quantité :</label><br>
-  <input type="number" id="quantite" name="quantite" min="1" value="1" style="width: 60px; padding: 0.3rem; border-radius: 6px; border: 1px solid #ccc;" /><br><br>
+        <label for="quantite">Quantité :</label><br>
+        <input type="number" id="quantite" name="quantite" min="1" value="1" style="width: 60px; padding: 0.3rem; border-radius: 6px; border: 1px solid #ccc;" /><br><br>
 
-  <button id="ajouter-panier" class="btn-ajouter" disabled>Ajouter au panier</button><br>
-  <button class="btn-retour" onclick="window.location.href='index.html'">← Retour à l'accueil</button>
-`;
+        <button id="ajouter-panier" class="btn-ajouter" disabled>Ajouter au panier</button><br>
+        <button class="btn-retour" onclick="window.location.href='index.html'">← Retour à l'accueil</button>
+      `;
 
-const selectTaille = document.getElementById('taille');
-const selectPerso = document.getElementById('perso');
-const inputQuantite = document.getElementById('quantite');
-const boutonAjouter = document.getElementById('ajouter-panier');
+      // Validation du formulaire avant activation du bouton
+      const selectTaille = document.getElementById('taille');
+      const selectPerso = document.getElementById('perso');
+      const inputQuantite = document.getElementById('quantite');
+      const boutonAjouter = document.getElementById('ajouter-panier');
 
-function checkReady() {
-  const qte = parseInt(inputQuantite.value);
-  boutonAjouter.disabled = (selectTaille.value === '' || selectPerso.value === '' || !qte || qte < 1);
-}
+      function checkReady() {
+        const qte = parseInt(inputQuantite.value);
+        boutonAjouter.disabled = (selectTaille.value === '' || selectPerso.value === '' || !qte || qte < 1);
+      }
 
-selectTaille.addEventListener('change', checkReady);
-selectPerso.addEventListener('change', checkReady);
-inputQuantite.addEventListener('input', checkReady);
+      selectTaille.addEventListener('change', checkReady);
+      selectPerso.addEventListener('change', checkReady);
+      inputQuantite.addEventListener('input', checkReady);
 
-boutonAjouter.addEventListener('click', () => {
-  const taille = selectTaille.value;
-  const [persoText, persoPrix] = selectPerso.value.split('|');
-  const quantite = parseInt(inputQuantite.value);
-  const prixUnitaire = produit.prix + parseFloat(persoPrix);
-  const prixFinal = prixUnitaire * quantite;
+      // Ajout au panier
+      boutonAjouter.addEventListener('click', () => {
+        const taille = selectTaille.value;
+        const [persoText, persoPrix] = selectPerso.value.split('|');
+        const quantite = parseInt(inputQuantite.value);
+        const prixUnitaire = produit.prix + parseFloat(persoPrix);
+        const prixFinal = prixUnitaire * quantite;
 
-  panier.push({
-    nom: produit.nom,
-    prix: prixFinal,
-    taille: taille,
-    personnalisation: persoText,
-    quantite: quantite,
-    prixUnitaire: prixUnitaire
-  });
+        panier.push({
+          nom: produit.nom,
+          prix: prixFinal,
+          taille: taille,
+          personnalisation: persoText,
+          quantite: quantite,
+          prixUnitaire: prixUnitaire
+        });
 
-  localStorage.setItem('panier', JSON.stringify(panier));
-  afficherPanier();
-  alert(`Ajouté : ${produit.nom} (${taille}, ${persoText}) x${quantite} pour ${prixFinal.toFixed(2)} $`);
-});
+        localStorage.setItem('panier', JSON.stringify(panier));
+        afficherPanier();
+        alert(`Ajouté : ${produit.nom} (${taille}, ${persoText}) x${quantite} pour ${prixFinal.toFixed(2)} $`);
+      });
+
       afficherPanier();
     });
 
-  // Init
+  // Initialisation
   afficherPanier();
   majNbItems();
 </script>
+
 <div id="footer-container"></div>
 
 <script>
@@ -265,5 +302,6 @@ boutonAjouter.addEventListener('click', () => {
       document.getElementById('footer-container').outerHTML = data;
     });
 </script>
+
 </body>
 </html>

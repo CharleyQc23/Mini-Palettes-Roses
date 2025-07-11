@@ -6,6 +6,7 @@
   <title>Mini Palettes Roses - Boutique</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script src="https://js.stripe.com/v3/"></script>
   <style>
 #galerie-produits {
   display: flex;
@@ -76,6 +77,9 @@
 </head>
 
 <body>
+<div class="bandeau-taxes">
+  TOUS LES PRIX INCLUENT LES TAXES
+</div>
 
 <header class="banniere">
   <div class="entete-logo-texte">
@@ -84,10 +88,10 @@
     </a>
     <div>
       <h1>Mini Palettes Roses</h1>
-      <p>La boutique officielle de nos futures Palettes Roses!</p>
+      <p>La boutique officielle des futures Palettes Roses!</p>
     </div>
   </div>
-  <a href="contact.html" class="btn-contact">📩 Nous rejoindre</a>
+    <a href="contact.html" class="btn-contact">📩 Nous rejoindre</a>
 </header>
 
 <button id="btn-panier" title="Voir le panier">🛒 Panier (<span id="nb-items">0</span>)</button>
@@ -183,8 +187,30 @@
 
   afficherPanier();
 
-  document.getElementById('payer').addEventListener('click', () => {
-    window.location.href = 'confirmation.html';
+  // ** Nouveau gestionnaire du bouton "Procéder au paiement" **
+  document.getElementById('payer').addEventListener('click', async () => {
+    if (panier.length === 0) {
+      alert("Ton panier est vide !");
+      return;
+    }
+    try {
+      const response = await fetch('http://localhost:4242/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ panier }),
+      });
+      const data = await response.json();
+
+      if (data.id) {
+        const stripe = Stripe('pk_test_51RjVtFPtAYsb0tTKFaXBb3U96XQePm5nInGkVMaubkiqz9tWXLyv2qqQLfLsFQRxUwH2jHzZBp9ZLhA9TR2k1N0a007kRZOPEr'); // Clé publique Stripe ici
+        await stripe.redirectToCheckout({ sessionId: data.id });
+      } else {
+        alert('Erreur lors de la création de la session de paiement.');
+      }
+    } catch (error) {
+      console.error('Erreur paiement:', error);
+      alert('Erreur lors du paiement. Regarde la console.');
+    }
   });
 </script>
 

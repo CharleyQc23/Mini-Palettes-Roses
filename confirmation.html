@@ -24,7 +24,18 @@
     li {
       margin: 0.5rem 0;
     }
+    #checkout-button {
+      background-color: #ff66b2;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
   </style>
+  <script src="https://js.stripe.com/v3/"></script>
 </head>
 
 <body>
@@ -35,7 +46,7 @@
     </a>
     <div>
       <h1>Mini Palettes Roses</h1>
-      <p>La boutique officielle de nos futures Palettes Roses!</p>
+      <p>La boutique officielle des futures Palettes Roses!</p>
     </div>
   </div>
   <a href="contact.html" class="btn-contact">📩 Nous rejoindre</a>
@@ -46,6 +57,11 @@
   <p>Voici le résumé :</p>
   <ul id="recap-commande"></ul>
   <p><strong>Total : <span id="total-final">0.00</span> $</strong></p>
+
+  <!-- Bouton Stripe -->
+  <button id="checkout-button">Procéder au paiement</button>
+
+  <br><br>
   <button class="btn-retour" onclick="window.location.href='index.html'">Retour à l'accueil</button>
 </main>
 
@@ -67,10 +83,12 @@
   }
 
   totalSpan.textContent = total.toFixed(2);
-  localStorage.removeItem('panier'); // vider le panier après confirmation
 </script>
-<div id="footer-container"></div>
 
+<!-- Stripe Checkout JS -->
+<script src="paiement.js"></script>
+
+<div id="footer-container"></div>
 <script>
   fetch('footer.html')
     .then(response => response.text())
