@@ -24,8 +24,8 @@ app.post('/create-checkout-session', async (req, res) => {
       payment_method_types: ['card'],
       line_items: items,
       mode: 'payment',
-      success_url: 'https://CharleyQc23.github.io/Mini-Palettes-Roses/success.html',
-      cancel_url: 'https://CharleyQc23.github.io/Mini-Palettes-Roses/cancel.html',
+  success_url: 'https://charleyqc23.github.io/Mini-Palettes-Roses/success.html',
+  cancel_url: 'https://charleyqc23.github.io/Mini-Palettes-Roses/cancel.html',
     });
 
     res.json({ id: session.id });

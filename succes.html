@@ -33,5 +33,9 @@
   <p>Ton paiement a été reçu avec succès.</p>
   <p>Nous préparons ta commande et te contacterons bientôt.</p>
   <p><a href="index.html">Retour à l'accueil</a></p>
+    <script>
+    // Vider le panier local après achat réussi
+    localStorage.removeItem('panier');
+  </script>
 </body>
 </html>

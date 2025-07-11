@@ -1,4 +1,4 @@
-const stripe = Stripe("pk_test_XXXXXXXXXXXXXXXXXXXXXXXX"); // remplace avec ta clé publique
+const stripe = Stripe("pk_test_51RjVtFPtAYsb0tTKFaXBb3U96XQePm5nInGkVMaubkiqz9tWXLyv2qqQLfLsFQRxUwH2jHzZBp9ZLhA9TR2k1N0a007kRZOPEr"); // remplace avec ta clé publique
 
 document.getElementById("checkout-button").addEventListener("click", () => {
   fetch("/create-checkout-session", {

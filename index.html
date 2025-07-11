@@ -144,6 +144,7 @@
   document.getElementById('btn-panier').addEventListener('click', () => {
     document.getElementById('sidebar-panier').classList.toggle('open');
   });
+
   document.getElementById('btn-fermer-panier').addEventListener('click', () => {
     document.getElementById('sidebar-panier').classList.remove('open');
   });
@@ -187,14 +188,14 @@
 
   afficherPanier();
 
-  // ** Nouveau gestionnaire du bouton "Procéder au paiement" **
+  // Paiement via Stripe Checkout
   document.getElementById('payer').addEventListener('click', async () => {
     if (panier.length === 0) {
       alert("Ton panier est vide !");
       return;
     }
     try {
-      const response = await fetch('http://localhost:4242/create-checkout-session', {
+      const response = await fetch('https://mini-palettes-roses.onrender.com/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ panier }),
@@ -202,7 +203,7 @@
       const data = await response.json();
 
       if (data.id) {
-        const stripe = Stripe('pk_test_51RjVtFPtAYsb0tTKFaXBb3U96XQePm5nInGkVMaubkiqz9tWXLyv2qqQLfLsFQRxUwH2jHzZBp9ZLhA9TR2k1N0a007kRZOPEr'); // Clé publique Stripe ici
+        const stripe = Stripe('pk_test_51RjVtFPtAYsb0tTKFaXBb3U96XQePm5nInGkVMaubkiqz9tWXLyv2qqQLfLsFQRxUwH2jHzZBp9ZLhA9TR2k1N0a007kRZOPEr'); // Remplace si besoin
         await stripe.redirectToCheckout({ sessionId: data.id });
       } else {
         alert('Erreur lors de la création de la session de paiement.');
